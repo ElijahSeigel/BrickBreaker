@@ -2,17 +2,26 @@
 
 
 //brick dimension: H:25 W:100
+//ball radius: 10
 //paddle dimension: H:20 W:150
 function BrickBreaker(){
 	var self = this;
 	this.width = 1000;
 	this.height = 500;
-	this.paddle = {x:430, y: 460}
+	this.ball = {x:500, y: 250}
+	this.paddle = {x:425, y: 460}
 	//this.bricks = this.getBricks();
+	
+	//paddle variables
 	this.direction = 'still';
 	this.speed = 1;
 	this.slowStart = 0;
 	this.MAXSPEED = 5;
+	
+	//ball variables
+	this.vertical = -2;
+	this.horizontal = 0;
+	
 	this.win = false;
 	this.over = false;
 	this.score = 0;
@@ -23,12 +32,13 @@ function BrickBreaker(){
 	document.body.appendChild(canvas);
 	this.ctx = canvas.getContext('2d');
 	
+		
 	this.handleKeyUp = this.handleKeyUp.bind(this);
 	this.handleKeyDown = this.handleKeyDown.bind(this);
 	window.addEventListener('keydown', this.handleKeyDown);
-	window.addEventListener('keyup', this.handleKeyDown);
+	window.addEventListener('keyup', this.handleKeyUp);
 
-	this.interval = setInterval(()=>this.loop(), 100);
+	this.interval = setInterval(()=>this.loop(), 20);
 }
 
 
@@ -49,6 +59,9 @@ BrickBreaker.prototype.handleKeyDown = function(event) {
 					this.slowStart ++;
 				}
 			}
+			else{
+				this.slowStart = 0;
+			}
 			this.direction = 'left';
 			break;
 		case 'd':
@@ -63,6 +76,9 @@ BrickBreaker.prototype.handleKeyDown = function(event) {
 				else{
 					this.slowStart ++;
 				}
+			}
+			else{
+				this.slowStart = 0;
 			}
 			this.direction = 'right';
 			break;
@@ -104,24 +120,26 @@ BrickBreaker.prototype.render = function() {
   this.ctx.fillRect(0, 0,
       this.width,
       this.height);
+  this.ctx.fillStyle = "white";
+  this.ctx.font = '16px sans-serif';
+  this.ctx.fillText("Points: "+ this.score, 10, 495);
   // Draw Paddle
-  this.ctx.fillStyle = "ivory";
+  this.ctx.fillStyle = "white";
   this.ctx.fillRect(
       this.paddle.x,
       this.paddle.y,
-      this.150,
-      this.20
+      150,
+      20
   );
-  // Draw food pellets
-  this.ctx.fillStyle = 'gold';
-  this.food.forEach((food) => {
-    this.ctx.fillRect(
-      food.x * this.cellSize,
-      food.y * this.cellSize,
-      this.cellSize,
-      this.cellSize
-    );
-  });
+  //draw ball
+  var ballFill = this.ctx.createRadialGradient(this.ball.x,this.ball.y,0,this.ball.x,this.ball.y,15);
+  ballFill.addColorStop(0, "black");
+  ballFill.addColorStop(1, "white");
+  this.ctx.beginPath();
+  this.ctx.arc(this.ball.x,this.ball.y, 10, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fillStyle = ballFill;
+  this.ctx.fill();
 }
 
 
@@ -136,19 +154,44 @@ BrickBreaker.prototype.render = function() {
 
 //update
 BrickBreaker.prototype.update = function() {
+  
+  //move paddle
   var x = this.paddle.x;
   var y = this.paddle.y;
   switch(this.direction) {
     case 'right':
-      if(x > 0 && x+40+this.speed < this.width)
+      if(x+150+this.speed < this.width)
 		x+= this.speed;
       break;
     case 'left':
-      if(x - this.speed > 0 && x+40 < this.width)
+      if(x - this.speed > 0)
 		x-= this.speed;
       break;
   }
   this.paddle = {x: x, y: y};
+  
+  
+  //move ball
+  this.ball.x+=this.horizontal;
+  this.ball.y+=this.vertical;
+  
+  //loss
+  if(this.ball.y+10>=500)
+  {
+	  this.gameOver();
+	  return;
+  }
+  
+  //wall bounces
+  if(this.ball.x -10<=0 || this.ball.x + 10 >=1000)
+  {
+	this.horizontal = 0-this.horizontal;
+  }
+  //ceiling bounce
+  if(this.ball.y-10 <= 0)
+  {
+	this.vertical = 0-this.vertical;
+  }
 }
 
 
