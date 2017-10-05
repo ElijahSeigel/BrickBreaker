@@ -21,6 +21,7 @@ function BrickBreaker(){
 	this.speed = 0;
 	this.slowStart = 0;
 	this.MAXSPEED = 5;
+	this.wait = 0;
 	
 	//ball variables
 	this.vertical = 1;
@@ -176,8 +177,19 @@ BrickBreaker.prototype.render = function() {
   this.ctx.fill();
 }
 
+BrickBreaker.prototype.animateBreak = async function (x, y){
+  var o =0.4;
+  this.fade(x,y,o);
+}
 
-
+BrickBreaker.prototype.fade = function (x, y, o){
+  this.ctx.fillStyle = "rgba(255,255,255,"+o+")";
+  this.ctx.strokeStyle = "black";
+  this.ctx.fillRect(x,y, 100, 25);
+  this.ctx.strokeRect(x,y, 100, 25);
+  if(o<1)
+	  window.setTimeout(this.fade(x,y,o+0.1), 10000);
+}
 
 
 
@@ -197,20 +209,22 @@ BrickBreaker.prototype.update = function() {
 
 
   //move paddle
-  var x = this.paddle.x;
-  var y = this.paddle.y;
-  switch(this.direction) {
-    case 'right':
-      if(x+150+this.speed < this.width)
-		x+= this.speed;
-      break;
-    case 'left':
-      if(x - this.speed > 0)
-		x-= this.speed;
-      break;
-  }
-  this.paddle = {x: x, y: y};
-  
+  this.wait=Math.max(this.wait-1, 0);
+  if(this.wait===0){
+	  var x = this.paddle.x;
+	  var y = this.paddle.y;
+	  switch(this.direction) {
+		case 'right':
+		  if(x+150+this.speed < this.width)
+			x+= this.speed;
+		  break;
+		case 'left':
+		  if(x - this.speed > 0)
+			x-= this.speed;
+		  break;
+	  }
+	  this.paddle = {x: x, y: y};
+	  }
   
   //move ball
   this.ball.x+=this.horizontal;
@@ -223,14 +237,19 @@ BrickBreaker.prototype.update = function() {
 	  return;
   }
   
+  //check bounces
+  var bounce = document.getElementById("bounce");
+  var breakNoise = document.getElementById("break");
   //wall bounces
   if(this.ball.x -10<=0 || this.ball.x + 10 >=1000)
   {
+	bounce.play();  
 	this.horizontal = 0-this.horizontal;
   }
   //ceiling bounce
   if(this.ball.y-10 <= 0)
   {
+	bounce.play();    
 	this.vertical = 0-this.vertical;
   }
   
@@ -253,10 +272,9 @@ BrickBreaker.prototype.update = function() {
     Math.pow(rx - this.ball.x, 2) +
     Math.pow(ry - this.ball.y, 2);
   if(distSquared < Math.pow(10, 2)) {
-	
-	
-	
-	if(this.ball.x>this.paddle.x+150 || this.ball.x<this.paddle.x){
+  	bounce.play();
+	if(this.ball.x > this.paddle.x+150 || this.ball.x < this.paddle.x){
+		this.wait = 5; 
 		this.horizontal = 0-this.horizontal;
 	}
 	else{
@@ -294,6 +312,8 @@ BrickBreaker.prototype.update = function() {
 			Math.pow(rx - this.ball.x, 2) +
 			Math.pow(ry - this.ball.y, 2);
 		  if(distSquared < Math.pow(10, 2)) {
+			this.animateBreak(brick.x, brick.y);
+			breakNoise.play();    
 			this.score += 10; 
 			this.bricks.splice(i, 1);
 			if(this.ball.x>brick.x+100 || this.ball.x<brick.x){
