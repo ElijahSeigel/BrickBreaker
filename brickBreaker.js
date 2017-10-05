@@ -1,6 +1,5 @@
 // brickBreaker.js
 
-
 //brick dimension: H:25 W:100
 //ball radius: 10
 //paddle dimension: H:20 W:150
@@ -15,7 +14,7 @@ function BrickBreaker(){
 					 {x:0, y:50}, {x:100, y:50}, {x:200, y:50}, {x:300, y:50}, {x:400, y:50}, {x:500, y:50}, {x:600, y:50}, {x:700, y:50}, {x:800, y:50}, {x:900, y:50},
 					 {x:0, y:75}, {x:100, y:75}, {x:200, y:75}, {x:300, y:75}, {x:400, y:75}, {x:500, y:75}, {x:600, y:75}, {x:700, y:75}, {x:800, y:75}, {x:900, y:75},					 
 					 {x:0, y:100}, {x:100, y:100}, {x:200, y:100}, {x:300, y:100}, {x:400, y:100}, {x:500, y:100}, {x:600, y:100}, {x:700, y:100}, {x:800, y:100}, {x:900, y:100}];
-	
+	this.broken = [];
 	//paddle variables
 	this.direction = 'still';
 	this.speed = 0;
@@ -26,6 +25,37 @@ function BrickBreaker(){
 	//ball variables
 	this.vertical = 1;
 	this.horizontal = 1;
+	this.tail1 = {x:500, y: 250};
+	this.tail2 = {x:500, y: 250};
+	this.tail3 = {x:500, y: 250};
+	this.tail4 = {x:500, y: 250};
+	this.tail5 = {x:500, y: 250};
+	this.tail6 = {x:500, y: 250};
+	this.tail7 = {x:500, y: 250};
+	this.tail8 = {x:500, y: 250};
+	this.tail9 = {x:500, y: 250};
+	this.tail10 = {x:500, y: 250};
+	this.tail11 = {x:500, y: 250};
+	this.tail12 = {x:500, y: 250};
+	this.tail13 = {x:500, y: 250};
+	this.tail14 = {x:500, y: 250};
+	this.tail15 = {x:500, y: 250};
+	this.tail16 = {x:500, y: 250};
+	this.tail17 = {x:500, y: 250};
+	this.tail18 = {x:500, y: 250};
+	this.tail19 = {x:500, y: 250};
+	this.tail20 = {x:500, y: 250};
+	this.tail21 = {x:500, y: 250};
+	this.tail22 = {x:500, y: 250};
+	this.tail23 = {x:500, y: 250};
+	this.tail24 = {x:500, y: 250};
+	this.tail25 = {x:500, y: 250};
+	this.tail26 = {x:500, y: 250};
+	this.tail27 = {x:500, y: 250};
+	this.tail28 = {x:500, y: 250};
+	this.tail29 = {x:500, y: 250};
+	this.tail30 = {x:500, y: 250};
+	
 	
 	this.win = false;
 	this.over = false;
@@ -40,8 +70,7 @@ function BrickBreaker(){
 	document.body.appendChild(canvas);
 	this.ctx = canvas.getContext('2d');
 	
-		
-	this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
 	this.handleKeyDown = this.handleKeyDown.bind(this);
 	window.addEventListener('keydown', this.handleKeyDown);
 	window.addEventListener('keyup', this.handleKeyUp);
@@ -114,21 +143,21 @@ BrickBreaker.prototype.gameOver = function() {
 //render that isht
 BrickBreaker.prototype.render = function() {
   if(this.over) {
-    this.ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    this.ctx.fillStyle = 'rgba(255,255,255,.2)';
     this.ctx.fillRect(0,0,
       this.width,
       this.height);
-    this.ctx.fillStyle = "blue";
-    this.ctx.font = '16px sans-serif';
+    this.ctx.fillStyle = "white";
+    this.ctx.font = '30px sans-serif';
 	if(this.win)
 	{
-      this.ctx.fillText("You Win", 10, 20);
+      this.ctx.fillText("You Win", 20, 200);
 	}else{
-      this.ctx.fillText("Game Over", 10, 20);
+      this.ctx.fillText("Game Over", 20, 200);
     }
-    this.ctx.fillText("Points: "+ this.score, 10, 40);
-    this.ctx.font = '10px sans-serif';
-    this.ctx.fillText("Press spacebar for new game", 10, 60);
+    this.ctx.fillText("Points: "+ this.score, 20, 250);
+    this.ctx.font = '20px sans-serif';
+    this.ctx.fillText("Press spacebar for new game", 20, 290);
     return;
   }
   //draw play area
@@ -166,6 +195,26 @@ BrickBreaker.prototype.render = function() {
     );
   });
   
+  //draw broken bricks
+  this.ctx.strokeStyle = "black";
+  this.broken.forEach((brick) => {
+	 this.ctx.fillStyle = "rgba(255,255,255,"+brick.opacity+")";
+    this.ctx.fillRect(
+      brick.x,
+      brick.y,
+      100,
+      25
+    );
+	this.ctx.strokeRect(
+      brick.x,
+      brick.y,
+      100,
+      25
+    );
+	if(brick.opacity>0)
+	  brick.opacity -= .01;
+  });
+  
   //draw ball
   var ballFill = this.ctx.createRadialGradient(this.ball.x,this.ball.y,0,this.ball.x,this.ball.y,15);
   ballFill.addColorStop(0, "black");
@@ -175,27 +224,64 @@ BrickBreaker.prototype.render = function() {
   this.ctx.stroke();
   this.ctx.fillStyle = ballFill;
   this.ctx.fill();
+ 
+
+ //draw tail
+  this.ctx.strokeStyle = "white";
+  this.ctx.fillStyle = "rgba(255,255,255,.9)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail1.x,this.tail1.y, 9, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.8)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail3.x,this.tail3.y, 8, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.7)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail6.x,this.tail6.y, 7, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.6)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail9.x,this.tail9.y, 6, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.5)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail12.x,this.tail12.y, 5, 0, 6 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.4)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail15.x,this.tail15.y, 4, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.3)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail18.x,this.tail18.y, 3, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.2)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail21.x,this.tail21.y, 2, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
+  
+  this.ctx.fillStyle = "rgba(255,255,255,.1)";
+  this.ctx.beginPath();
+  this.ctx.arc(this.tail24.x,this.tail24.y, 1, 0, 2 * Math.PI);
+  this.ctx.stroke();
+  this.ctx.fill();
 }
-
-BrickBreaker.prototype.animateBreak = async function (x, y){
-  var o =0.4;
-  this.fade(x,y,o);
-}
-
-BrickBreaker.prototype.fade = function (x, y, o){
-  this.ctx.fillStyle = "rgba(255,255,255,"+o+")";
-  this.ctx.strokeStyle = "black";
-  this.ctx.fillRect(x,y, 100, 25);
-  this.ctx.strokeRect(x,y, 100, 25);
-  if(o<1)
-	  window.setTimeout(this.fade(x,y,o+0.1), 10000);
-}
-
-
-
-
-
-
 
 
 //update
@@ -209,8 +295,9 @@ BrickBreaker.prototype.update = function() {
 
 
   //move paddle
-  this.wait=Math.max(this.wait-1, 0);
-  if(this.wait===0){
+  if (this.wait > 0)
+    this.wait--;
+  else{
 	  var x = this.paddle.x;
 	  var y = this.paddle.y;
 	  switch(this.direction) {
@@ -227,6 +314,79 @@ BrickBreaker.prototype.update = function() {
 	  }
   
   //move ball
+
+  this.tail24.x= this.tail23.x;
+  this.tail24.y= this.tail23.y;
+  
+  this.tail23.x= this.tail22.x;
+  this.tail23.y= this.tail22.y;
+  
+  this.tail22.x= this.tail21.x;
+  this.tail22.y= this.tail21.y;
+
+  this.tail21.x= this.tail20.x;
+  this.tail21.y= this.tail20.y;
+  
+  this.tail20.x= this.tail19.x;
+  this.tail20.y= this.tail19.y;
+  
+  this.tail19.x= this.tail18.x;
+  this.tail19.y= this.tail18.y;
+  
+  this.tail18.x= this.tail17.x;
+  this.tail18.y= this.tail17.y;
+  
+  this.tail17.x= this.tail16.x;
+  this.tail17.y= this.tail16.y;
+  
+  this.tail16.x= this.tail15.x;
+  this.tail16.y= this.tail15.y;
+
+  this.tail15.x= this.tail14.x;
+  this.tail15.y= this.tail14.y;
+  
+  this.tail14.x= this.tail13.x;
+  this.tail14.y= this.tail13.y;
+  
+  this.tail13.x= this.tail12.x;
+  this.tail13.y= this.tail12.y;
+  
+  this.tail12.x= this.tail10.x;
+  this.tail12.y= this.tail10.y;
+
+  this.tail11.x= this.ball.x;
+  this.tail11.y= this.ball.y;
+    
+  this.tail10.x= this.tail9.x;
+  this.tail10.y= this.tail9.y;
+  
+  this.tail9.x= this.tail8.x;
+  this.tail9.y= this.tail8.y;
+  
+  this.tail8.x= this.tail7.x;
+  this.tail8.y= this.tail7.y;
+  
+  this.tail7.x= this.tail6.x;
+  this.tail7.y= this.tail6.y;
+  
+  this.tail6.x= this.tail5.x;
+  this.tail6.y= this.tail5.y;
+
+  this.tail5.x= this.tail4.x;
+  this.tail5.y= this.tail4.y;
+  
+  this.tail4.x= this.tail3.x;
+  this.tail4.y= this.tail3.y;
+  
+  this.tail3.x= this.tail2.x;
+  this.tail3.y= this.tail2.y;
+  
+  this.tail2.x= this.tail1.x;
+  this.tail2.y= this.tail1.y;
+
+  this.tail1.x= this.ball.x;
+  this.tail1.y= this.ball.y;
+
   this.ball.x+=this.horizontal;
   this.ball.y+=this.vertical;
   
@@ -273,8 +433,8 @@ BrickBreaker.prototype.update = function() {
     Math.pow(ry - this.ball.y, 2);
   if(distSquared < Math.pow(10, 2)) {
   	bounce.play();
+	this.wait = 5;
 	if(this.ball.x > this.paddle.x+150 || this.ball.x < this.paddle.x){
-		this.wait = 5; 
 		this.horizontal = 0-this.horizontal;
 	}
 	else{
@@ -284,7 +444,7 @@ BrickBreaker.prototype.update = function() {
     else if (this.horizontal >= 0 && this.direction === 'left')
 		this.horizontal = Math.max(this.horizontal-1, 1);
 	else if (this.horizontal < 0 && this.direction === 'left')
-		this.horizontal = Math.max(this.horizontal-1, -1);
+		this.horizontal = Math.max(this.horizontal-1, -4);
 	 else if (this.horizontal < 0 && this.direction === 'right')
 		this.horizontal = Math.min(this.horizontal+1, -1);
 	}
@@ -312,7 +472,7 @@ BrickBreaker.prototype.update = function() {
 			Math.pow(rx - this.ball.x, 2) +
 			Math.pow(ry - this.ball.y, 2);
 		  if(distSquared < Math.pow(10, 2)) {
-			this.animateBreak(brick.x, brick.y);
+			this.broken.push({x: brick.x, y: brick.y, opacity: 1})  
 			breakNoise.play();    
 			this.score += 10; 
 			this.bricks.splice(i, 1);
