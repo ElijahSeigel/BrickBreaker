@@ -215,18 +215,7 @@ BrickBreaker.prototype.render = function() {
 	  brick.opacity -= .01;
   });
   
-  //draw ball
-  var ballFill = this.ctx.createRadialGradient(this.ball.x,this.ball.y,0,this.ball.x,this.ball.y,15);
-  ballFill.addColorStop(0, "black");
-  ballFill.addColorStop(1, "white");
-  this.ctx.beginPath();
-  this.ctx.arc(this.ball.x,this.ball.y, 10, 0, 2 * Math.PI);
-  this.ctx.stroke();
-  this.ctx.fillStyle = ballFill;
-  this.ctx.fill();
- 
-
- //draw tail
+  //draw tail
   this.ctx.strokeStyle = "white";
   this.ctx.fillStyle = "rgba(255,255,255,.9)";
   this.ctx.beginPath();
@@ -281,6 +270,18 @@ BrickBreaker.prototype.render = function() {
   this.ctx.arc(this.tail24.x,this.tail24.y, 1, 0, 2 * Math.PI);
   this.ctx.stroke();
   this.ctx.fill();
+  
+  //draw ball
+  var ballFill = this.ctx.createRadialGradient(this.ball.x,this.ball.y,0,this.ball.x,this.ball.y, 9);
+  ballFill.addColorStop(0, "black");
+  ballFill.addColorStop(1, "white");
+  this.ctx.beginPath();
+  this.ctx.arc(this.ball.x,this.ball.y, 10, 0, 2 * Math.PI);
+  this.ctx.fillStyle = ballFill;
+  this.ctx.fill();
+  this.ctx.strokeStyle = 'white';
+  this.ctx.stroke();
+  
 }
 
 
@@ -498,4 +499,4 @@ BrickBreaker.prototype.loop = function() {
 }
 
 
-new BrickBreaker
+new BrickBreaker();
