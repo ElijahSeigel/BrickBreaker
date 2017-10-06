@@ -17,8 +17,8 @@
 
 /** This function represents the entire game, it keeps track 
   * of the ball (and it's 30 pixel tail), the paddle, the 
-  * bricks broken and present, thescore, the status of the game (win/lose),
-  * It binds the keyhandlers, and sets the interval for the loop.
+  * bricks broken and present, the score, the status of the game (win/lose),
+  * it binds the keyhandlers, and sets the interval for the loop.
   */
 function BrickBreaker(){
 	//gamespace size
@@ -443,16 +443,20 @@ BrickBreaker.prototype.update = function() {
   //wall bounces
   if(this.ball.x -10<=0 || this.ball.x + 10 >=1000)
   {
-	bounce.pause();//makes sure the noise is played for each bounce, none are skipped.
-	bounce.currentTime = 0;	
+	if(!bounce.ended){
+		bounce.pause();//makes sure the noise is played for each bounce, none are skipped.
+		bounce.currentTime = 0;	
+	}
 	bounce.play();  
 	this.horizontal = 0-this.horizontal;
   }
   //ceiling bounce
   if(this.ball.y-10 <= 0)
   {
-	bounce.pause();
-	bounce.currentTime = 0;		
+	if(!bounce.ended){
+		bounce.pause();
+		bounce.currentTime = 0;
+	}		
 	bounce.play();    
 	this.vertical = 0-this.vertical;
   }
@@ -479,8 +483,10 @@ BrickBreaker.prototype.update = function() {
     Math.pow(ry - this.ball.y, 2);
   if(distSquared < Math.pow(10, 2)) {
 	  if(!this.bounceFlag){
-		bounce.pause();
-		bounce.currentTime = 0;		
+		if(!bounce.ended){
+			bounce.pause();
+			bounce.currentTime = 0;	
+		}			
 		bounce.play();
 		this.wait = 5;
 		if(this.ball.x > this.paddle.x+150 || this.ball.x < this.paddle.x){
@@ -527,8 +533,10 @@ BrickBreaker.prototype.update = function() {
 			Math.pow(ry - this.ball.y, 2);
 		  if(distSquared < Math.pow(10, 2)) {
 			this.broken.push({x: brick.x, y: brick.y, opacity: 1})  
-			breakNoise.pause();
-			breakNoise.currentTime = 0;
+			if(!breakNoise.ended){
+				breakNoise.pause();
+				breakNoise.currentTime = 0;
+			}
 			breakNoise.play();    
 			this.score += 10; 
 			this.bricks.splice(i, 1);
