@@ -96,8 +96,8 @@ function BrickBreaker(){
 	this.handleKeyDown = this.handleKeyDown.bind(this);
 	window.addEventListener('keydown', this.handleKeyDown);
 	window.addEventListener('keyup', this.handleKeyUp);
-
-	this.interval = setInterval(()=>this.loop(), 10);
+	//start the game loop on interval
+	this.interval = setInterval(()=>this.loop(), 10);	
 }
 
 
@@ -443,12 +443,16 @@ BrickBreaker.prototype.update = function() {
   //wall bounces
   if(this.ball.x -10<=0 || this.ball.x + 10 >=1000)
   {
+	bounce.pause();//makes sure the noise is played for each bounce, none are skipped.
+	bounce.currentTime = 0;	
 	bounce.play();  
 	this.horizontal = 0-this.horizontal;
   }
   //ceiling bounce
   if(this.ball.y-10 <= 0)
   {
+	bounce.pause();
+	bounce.currentTime = 0;		
 	bounce.play();    
 	this.vertical = 0-this.vertical;
   }
@@ -475,6 +479,8 @@ BrickBreaker.prototype.update = function() {
     Math.pow(ry - this.ball.y, 2);
   if(distSquared < Math.pow(10, 2)) {
 	  if(!this.bounceFlag){
+		bounce.pause();
+		bounce.currentTime = 0;		
 		bounce.play();
 		this.wait = 5;
 		if(this.ball.x > this.paddle.x+150 || this.ball.x < this.paddle.x){
@@ -521,6 +527,8 @@ BrickBreaker.prototype.update = function() {
 			Math.pow(ry - this.ball.y, 2);
 		  if(distSquared < Math.pow(10, 2)) {
 			this.broken.push({x: brick.x, y: brick.y, opacity: 1})  
+			breakNoise.pause();
+			breakNoise.currentTime = 0;
 			breakNoise.play();    
 			this.score += 10; 
 			this.bricks.splice(i, 1);
