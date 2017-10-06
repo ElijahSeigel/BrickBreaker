@@ -443,7 +443,8 @@ BrickBreaker.prototype.update = function() {
   //wall bounces
   if(this.ball.x -10<=0 || this.ball.x + 10 >=1000)
   {
-	bounce.pause();//makes sure the noise is played for each bounce, none are skipped.
+	if(!bounce.paused)
+		bounce.pause();//makes sure the noise is played for each bounce, none are skipped.
 	bounce.currentTime = 0;	
 	bounce.play();  
 	this.horizontal = 0-this.horizontal;
@@ -451,7 +452,8 @@ BrickBreaker.prototype.update = function() {
   //ceiling bounce
   if(this.ball.y-10 <= 0)
   {
-	bounce.pause();
+	if(!bounce.paused)
+		bounce.pause();
 	bounce.currentTime = 0;		
 	bounce.play();    
 	this.vertical = 0-this.vertical;
@@ -479,7 +481,8 @@ BrickBreaker.prototype.update = function() {
     Math.pow(ry - this.ball.y, 2);
   if(distSquared < Math.pow(10, 2)) {
 	  if(!this.bounceFlag){
-		bounce.pause();
+		if(!bounce.paused)
+			bounce.pause();
 		bounce.currentTime = 0;		
 		bounce.play();
 		this.wait = 5;
@@ -527,6 +530,7 @@ BrickBreaker.prototype.update = function() {
 			Math.pow(ry - this.ball.y, 2);
 		  if(distSquared < Math.pow(10, 2)) {
 			this.broken.push({x: brick.x, y: brick.y, opacity: 1})  
+			if(!breakNoise.paused)
 			breakNoise.pause();
 			breakNoise.currentTime = 0;
 			breakNoise.play();    
