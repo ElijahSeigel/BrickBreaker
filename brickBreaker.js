@@ -1,12 +1,30 @@
 // brickBreaker.js
+//This program was authored by Elijah Seigel for CIS580
+//Any un-authorized reproduction of this code is not cool dude
 
 //brick dimension: H:25 W:100
 //ball radius: 10
 //paddle dimension: H:20 W:150
+
+/** Slow start was added because with conventional acceleration of the paddle the game was too easy
+  * Slow start makes it so that the player must decide to move the paddle earlier and is punished 
+  * for making the 'wrong' choice, or over shooting, as it is more difficult to change direction
+  * the ball's tail lengthens the faster the ball moves, this makes judging the speed of the ball dramatically easier
+  * So that the game is only limited by the skill of the player, the ball can never move faster (horizontally) than the paddle at max speed
+  * this way the user can always react to the ball after a bounce even with slowstart.
+  */
+
+
+/** This function represents the entire game, it keeps track 
+  * of the ball (and it's 30 pixel tail), the paddle, the 
+  * bricks broken and present, thescore, the status of the game (win/lose),
+  * It binds the keyhandlers, and sets the interval for the loop.
+  */
 function BrickBreaker(){
-	var self = this;
+	//gamespace size
 	this.width = 1000;
 	this.height = 500;
+	//entity location
 	this.ball = {x:500, y: 250};
 	this.paddle = {x:425, y: 460};
 	this.bricks = 	[{x:0, y:0}, {x:100, y:0}, {x:200, y:0}, {x:300, y:0}, {x:400, y:0}, {x:500, y:0}, {x:600, y:0}, {x:700, y:0}, {x:800, y:0}, {x:900, y:0}, 
@@ -15,16 +33,18 @@ function BrickBreaker(){
 					 {x:0, y:75}, {x:100, y:75}, {x:200, y:75}, {x:300, y:75}, {x:400, y:75}, {x:500, y:75}, {x:600, y:75}, {x:700, y:75}, {x:800, y:75}, {x:900, y:75},					 
 					 {x:0, y:100}, {x:100, y:100}, {x:200, y:100}, {x:300, y:100}, {x:400, y:100}, {x:500, y:100}, {x:600, y:100}, {x:700, y:100}, {x:800, y:100}, {x:900, y:100}];
 	this.broken = [];
+	
 	//paddle variables
 	this.direction = 'still';
 	this.speed = 0;
 	this.slowStart = 0;
 	this.MAXSPEED = 5;
-	this.wait = 0;
+	this.bounceFlag = false;
 	
 	//ball variables
-	this.vertical = 1;
-	this.horizontal = 1;
+	this.vertical = 1; //these control the speed and slope of the ball's movement,
+	this.horizontal = 1; //and are manipulated to add some 'english' to the ball when it hits a moving paddle
+	//the tail is not treated as an entity because it has 0 effect on gameplay
 	this.tail1 = {x:500, y: 250};
 	this.tail2 = {x:500, y: 250};
 	this.tail3 = {x:500, y: 250};
@@ -56,10 +76,12 @@ function BrickBreaker(){
 	this.tail29 = {x:500, y: 250};
 	this.tail30 = {x:500, y: 250};
 	
-	
+	//boring game state variables
 	this.win = false;
 	this.over = false;
 	this.score = 0;
+	
+	//setup gunk for rendering on the canvas
 	var child = document.getElementById('canvas');
 	if (child)
 	  document.body.removeChild(document.getElementById('canvas'));
@@ -69,7 +91,7 @@ function BrickBreaker(){
 	canvas.height = this.height;
 	document.body.appendChild(canvas);
 	this.ctx = canvas.getContext('2d');
-	
+	//binding and adding the various event listners
     this.handleKeyUp = this.handleKeyUp.bind(this);
 	this.handleKeyDown = this.handleKeyDown.bind(this);
 	window.addEventListener('keydown', this.handleKeyDown);
@@ -80,7 +102,10 @@ function BrickBreaker(){
 
 
 
-//user input
+/** BrickBreaker.prototype.handleKeyDown
+  * this function takes a key down event,
+  * and adjusts paddle direction, speed, and slowstart, accordingly
+  */
 BrickBreaker.prototype.handleKeyDown = function(event) {
 	switch(event.key){
 		case 'a':
@@ -124,12 +149,17 @@ BrickBreaker.prototype.handleKeyDown = function(event) {
 	}
 }
 
+/** BrickBreaker.prototype.handleKeyUp
+  * function that stops the paddle and resets the speed when a key is lifted
+  */
 BrickBreaker.prototype.handleKeyUp = function(event) {
 	this.speed = 1;
 	this.direction = 'still';
 }
 
-//easy restart functionality
+/** BrickBreaker.prototype.gameOver
+  * easy restart functionality
+  */
 BrickBreaker.prototype.gameOver = function() {
   clearInterval(this.interval);
   window.removeEventListener('keydown', this.handleKeyDown);
@@ -140,8 +170,13 @@ BrickBreaker.prototype.gameOver = function() {
   this.over = true;
 }
 
-//render that isht
+/** BrickBreaker.prototype.render
+  * function that renders all game entities at each frame, 
+  * the score, and is also how game-over is conveyed to the user
+  */
 BrickBreaker.prototype.render = function() {
+  
+  //draw opaque overlay, display, win/lose, and give playagain instructions at end of game
   if(this.over) {
     this.ctx.fillStyle = 'rgba(255,255,255,.2)';
     this.ctx.fillRect(0,0,
@@ -160,11 +195,14 @@ BrickBreaker.prototype.render = function() {
     this.ctx.fillText("Press spacebar for new game", 20, 290);
     return;
   }
+  
   //draw play area
   this.ctx.fillStyle = "#000";
   this.ctx.fillRect(0, 0,
       this.width,
       this.height);
+  
+  // Draw score  
   this.ctx.fillStyle = "white";
   this.ctx.font = '16px sans-serif';
   this.ctx.fillText("Points: "+ this.score, 10, 495);
@@ -195,7 +233,7 @@ BrickBreaker.prototype.render = function() {
     );
   });
   
-  //draw broken bricks
+  //animate brick breaking with fadeout
   this.ctx.strokeStyle = "black";
   this.broken.forEach((brick) => {
 	 this.ctx.fillStyle = "rgba(255,255,255,"+brick.opacity+")";
@@ -285,7 +323,12 @@ BrickBreaker.prototype.render = function() {
 }
 
 
-//update
+/** BrickBreaker.prototype.update
+  * a function which updates the game between rendered frames
+  * checks for victory (this is done first instead of last so that the board is rendered with the last brick missing)
+  * moves the paddle and ball according to their varriables defined in the BrickBreaker function
+  * the final stages of update check for collision and adjust entity variables accrodingly.
+  */
 BrickBreaker.prototype.update = function() {
   
   //update win condition
@@ -296,9 +339,6 @@ BrickBreaker.prototype.update = function() {
 
 
   //move paddle
-  if (this.wait > 0)
-    this.wait--;
-  else{
 	  var x = this.paddle.x;
 	  var y = this.paddle.y;
 	  switch(this.direction) {
@@ -312,10 +352,9 @@ BrickBreaker.prototype.update = function() {
 		  break;
 	  }
 	  this.paddle = {x: x, y: y};
-	  }
+
   
   //move ball
-
   this.tail24.x= this.tail23.x;
   this.tail24.y= this.tail23.y;
   
@@ -417,6 +456,8 @@ BrickBreaker.prototype.update = function() {
   var rx;
   var ry;
   //bounce off paddle
+  //adjustment of this.horizontal is the 'english' put on the ball
+  //affects ball speed and angle
   rx = this.ball.x; 
   if(this.ball.x > this.paddle.x + 150)
 	  rx = this.paddle.x + 150;
@@ -433,24 +474,30 @@ BrickBreaker.prototype.update = function() {
     Math.pow(rx - this.ball.x, 2) +
     Math.pow(ry - this.ball.y, 2);
   if(distSquared < Math.pow(10, 2)) {
-  	bounce.play();
-	this.wait = 5;
-	if(this.ball.x > this.paddle.x+150 || this.ball.x < this.paddle.x){
-		this.horizontal = 0-this.horizontal;
-	}
-	else{
-	this.vertical = 0-this.vertical;
-	if (this.horizontal >= 0 && this.direction === 'right')
-		this.horizontal = Math.min(this.horizontal+1, 4);
-    else if (this.horizontal >= 0 && this.direction === 'left')
-		this.horizontal = Math.max(this.horizontal-1, 1);
-	else if (this.horizontal < 0 && this.direction === 'left')
-		this.horizontal = Math.max(this.horizontal-1, -4);
-	 else if (this.horizontal < 0 && this.direction === 'right')
-		this.horizontal = Math.min(this.horizontal+1, -1);
-	}
+	  if(!this.bounceFlag){
+		bounce.play();
+		this.wait = 5;
+		if(this.ball.x > this.paddle.x+150 || this.ball.x < this.paddle.x){
+			this.horizontal = 0-this.horizontal;
+		}
+		else{
+		this.vertical = 0-this.vertical;
+		if (this.horizontal >= 0 && this.direction === 'right')
+			this.horizontal = Math.min(this.horizontal+1, 4);
+		else if (this.horizontal >= 0 && this.direction === 'left')
+			this.horizontal = Math.max(this.horizontal-1, 1);
+		else if (this.horizontal < 0 && this.direction === 'left')
+			this.horizontal = Math.max(this.horizontal-1, -4);
+		 else if (this.horizontal < 0 && this.direction === 'right')
+			this.horizontal = Math.min(this.horizontal+1, -1);
+		}
+	  }
+	  this.bounceFlag=true;
 
 	}
+	else
+		this.bounceFlag = false;
+	
 	
 	//bounce off bricks
 	if(this.ball.y-10 <= 125)
@@ -492,7 +539,11 @@ BrickBreaker.prototype.update = function() {
 
 
 
-//loop
+/** BrickBreaker.prototype.loop
+  * this function represents one frame of the game
+  * the state is updated then changes are rendered on the canvas, 
+  * it is called at a set interval defined in function BrickBreaker
+  */
 BrickBreaker.prototype.loop = function() {
   this.update();
   this.render();
